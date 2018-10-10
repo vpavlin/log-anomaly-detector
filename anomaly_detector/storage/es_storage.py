@@ -63,33 +63,19 @@ class ESStorage(Storage):
         query = {
             'sort': {'@timestamp': {'order': 'desc'}},
             "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "query_string": {
-                                "analyze_wildcard": True,
-                                "query": ""
-                            }
-                        },
-                        {
-                            "range": {
-                                "@timestamp": {
-                                "gte": "now-900s",
-                                "lte": "now",
-                                }
-                            }
-                        }
-                    ],
-                    "must_not": []
+                "query_string": {
+                    "analyze_wildcard": True,
+                    "query": self.config.storage.ES_QUERY
                 }
             }
         }
         _LOGGER.info("Reading in max %d log entries in last %d seconds from %s", number_of_entires, time_range, self.config.storage.ES_ENDPOINT)
 
         query['size'] = number_of_entires
-        query['query']['bool']['must'][1]['range']['@timestamp']['gte'] = 'now-%ds' % time_range
-        query['query']['bool']['must'][0]['query_string']['query'] = self.config.storage.ES_QUERY
+        # query['query']['bool']['must'][1]['range']['@timestamp']['gte'] = 'now-%ds' % time_range
+        # query['query']['bool']['must'][0]['query_string']['query'] = self.config.storage.ES_QUERY
 
+        _LOGGER.info(query)
         es_data = self.es.search(index_in, body=json.dumps(query))
         if es_data['hits']['total'] == 0:
             return pandas.DataFrame(), es_data

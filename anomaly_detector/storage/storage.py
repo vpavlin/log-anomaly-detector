@@ -2,6 +2,7 @@
 """
 
 from abc import abstractmethod, ABCMeta
+import numpy as np
 
 import re
 
@@ -30,7 +31,8 @@ class Storage(object):
     @classmethod
     def _clean_message(cls, line):
         """Remove all none alphabetical characters from message strings."""
-        return "".join(re.findall("[a-zA-Z]+", line)) # Leaving only a-z in there as numbers add to anomalousness quite a bit
+        # return "".join(re.findall("[a-zA-Z]+", line)) # Leaving only a-z in there as numbers add to anomalousness quite a bit
+        return "".join(re.findall("[^0-9]+", line)) # Leaving only a-z in there as numbers add to anomalousness quite a bit
 
     @classmethod
     def _preprocess(cls, data):
